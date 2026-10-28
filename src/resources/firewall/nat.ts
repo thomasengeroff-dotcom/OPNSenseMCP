@@ -70,6 +70,15 @@ export interface NPTRule {
 export type NATMode = 'automatic' | 'hybrid' | 'manual' | 'disabled';
 
 /**
+ * Write a boolean flag for config.xml. OPNsense evaluates these with PHP's
+ * `!empty()` (Firewall\Rule::parseIsComment / parseBool), so an empty element
+ * such as `<disabled/>` counts as unset — only "1" sets a flag.
+ */
+function xmlFlag(set: boolean): string {
+  return set ? '1' : '0';
+}
+
+/**
  * Read a boolean flag out of an xml2js-parsed `/conf/config.xml` element.
  *
  * OPNsense writes these elements with "0" or "1" as their text content, so the
@@ -85,15 +94,6 @@ export type NATMode = 'automatic' | 'hybrid' | 'manual' | 'disabled';
 function xmlFlagSet(value: unknown): boolean {
   if (value === undefined || value === null) return false;
   return String(value).trim() === '1';
-}
-
-/**
- * Write a boolean flag for config.xml. OPNsense evaluates these with PHP's
- * `!empty()` (Firewall\Rule::parseIsComment / parseBool), so an empty element
- * such as `<disabled/>` counts as unset — only "1" sets a flag.
- */
-function xmlFlag(set: boolean): string {
-  return set ? '1' : '0';
 }
 
 export class NATResource {
